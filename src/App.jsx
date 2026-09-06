@@ -1,5 +1,12 @@
-const App = () => {
-  return <div>App</div>;
-};
+import { createBrowserRouter } from "react-router-dom";
+import Body from "./components/Body";
 
-export default App;
+const AppRouter = createBrowserRouter([
+  {
+    path: "",
+    Component: Body,
+    children: [{}],
+  },
+]);
+
+export default AppRouter;
