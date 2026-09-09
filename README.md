@@ -26,7 +26,7 @@ frontend/
 ## Status
 
 - [x] Project structure set up
-- [ ] Auth pages (login/signup)
+- [x] Auth pages (login/signup)
 - [ ] Teacher & student dashboards
 - [ ] Live quiz UI (Socket.io)
 
