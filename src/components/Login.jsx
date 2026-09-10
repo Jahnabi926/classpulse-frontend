@@ -12,6 +12,7 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
 
   const dispatch = useDispatch();
@@ -42,7 +43,7 @@ const Login = () => {
     try {
       const res = await axios.post(
         BASE_URL + "/signup",
-        { firstName, lastName, emailId, password },
+        { firstName, lastName, emailId, password, role },
         { withCredentials: true },
       );
       dispatch(addUser(res.data?.data));
@@ -107,7 +108,20 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
+        {!isLoginForm && (
+          <>
+            <label className="label">Role</label>
+            <select
+              className="select"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option disabled={true}>Pick a role</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </>
+        )}
         <button
           className="btn btn-neutral mt-4"
           onClick={isLoginForm ? handleLogin : handleSignUp}
