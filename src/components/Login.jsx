@@ -12,7 +12,7 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("student");
   const [error, setError] = useState("");
 
   const dispatch = useDispatch();
@@ -50,7 +50,7 @@ const Login = () => {
       navigate("/profile");
     } catch (error) {
       if (error.response) {
-        // server responded with an erroro (e.g. wrong credentials)
+        // server responded with an error (e.g. wrong credentials)
         setError(error.response.data || "Sign up failed.");
       } else if (error.request) {
         // request sent, no response came back
@@ -78,7 +78,10 @@ const Login = () => {
               className="input"
               placeholder="firstname"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                setError("");
+              }}
             />
             <label className="label">Last Name</label>
             <input
@@ -86,7 +89,10 @@ const Login = () => {
               className="input"
               placeholder="lastname"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                setError("");
+              }}
             />
           </>
         )}
@@ -97,7 +103,10 @@ const Login = () => {
           className="input"
           placeholder="Email"
           value={emailId}
-          onChange={(e) => setEmailId(e.target.value)}
+          onChange={(e) => {
+            setEmailId(e.target.value);
+            setError("");
+          }}
         />
 
         <label className="label">Password</label>
@@ -106,7 +115,10 @@ const Login = () => {
           className="input"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setError("");
+          }}
         />
         {!isLoginForm && (
           <>
@@ -114,9 +126,11 @@ const Login = () => {
             <select
               className="select"
               value={role}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={(e) => {
+                setRole(e.target.value);
+                setError("");
+              }}
             >
-              <option disabled={true}>Pick a role</option>
               <option value="teacher">Teacher</option>
               <option value="student">Student</option>
             </select>

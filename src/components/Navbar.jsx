@@ -29,10 +29,7 @@ const Navbar = () => {
     <div className="navbar bg-base-100 shadow-sm">
       <ErrorToast error={error} />
       <div className="flex-1">
-        <Link
-          to={user ? "/dashboard" : "/login"}
-          className="btn btn-ghost text-xl"
-        >
+        <Link to={user ? "/" : "/login"} className="btn btn-ghost text-xl">
           ClassPulse
         </Link>
       </div>
