@@ -13,7 +13,7 @@ const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
-  const [error, setError] = useState("");
+  const [error, setError] = useState({ message: "", id: 0 });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,11 +27,11 @@ const Login = () => {
       );
       dispatch(addUser(res.data?.data));
       navigate("/");
-    } catch (error) {
-      if (error.response) {
+    } catch (err) {
+      if (err.response) {
         // server responded with an error (e.g. wrong credentials)
-        setError(error.response.data || "Invalid email or password.");
-      } else if (error.request) {
+        setError({ message: err.response?.data, id: Date.now() });
+      } else if (err.request) {
         // request sent, no response came back
         setError("Network error — please check your connection.");
       } else {
@@ -48,11 +48,11 @@ const Login = () => {
       );
       dispatch(addUser(res.data?.data));
       navigate("/profile");
-    } catch (error) {
-      if (error.response) {
+    } catch (err) {
+      if (err.response) {
         // server responded with an error (e.g. wrong credentials)
-        setError(error.response.data || "Sign up failed.");
-      } else if (error.request) {
+        setError({ message: err.response?.data, id: Date.now() });
+      } else if (err.request) {
         // request sent, no response came back
         setError("Network error — please check your connection.");
       } else {
@@ -62,7 +62,7 @@ const Login = () => {
   };
   return (
     <div className="flex justify-center my-10">
-      <ErrorToast key={error} error={error} />
+      <ErrorToast key={error.id} error={error.message} />
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div className="mx-auto">
           <legend className="fieldset-legend">
@@ -80,7 +80,7 @@ const Login = () => {
               value={firstName}
               onChange={(e) => {
                 setFirstName(e.target.value);
-                setError("");
+                setError({ message: "", id: Date.now() });
               }}
             />
             <label className="label">Last Name</label>
@@ -91,7 +91,7 @@ const Login = () => {
               value={lastName}
               onChange={(e) => {
                 setLastName(e.target.value);
-                setError("");
+                setError({ message: "", id: Date.now() });
               }}
             />
           </>
@@ -105,7 +105,7 @@ const Login = () => {
           value={emailId}
           onChange={(e) => {
             setEmailId(e.target.value);
-            setError("");
+            setError({ message: "", id: Date.now() });
           }}
         />
 
@@ -117,7 +117,7 @@ const Login = () => {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            setError("");
+            setError({ message: "", id: Date.now() });
           }}
         />
         {!isLoginForm && (
@@ -128,7 +128,7 @@ const Login = () => {
               value={role}
               onChange={(e) => {
                 setRole(e.target.value);
-                setError("");
+                setError({ message: "", id: Date.now() });
               }}
             >
               <option value="teacher">Teacher</option>

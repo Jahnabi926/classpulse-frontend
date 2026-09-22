@@ -6,7 +6,7 @@ import { BASE_URL } from "../utils/constants";
 export const CreateClassForm = ({ onCreated }) => {
   const [className, setClassName] = useState("");
   const [subject, setSubject] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState({ message: "", id: 0 });
 
   const handleCreate = async () => {
     try {
@@ -19,10 +19,10 @@ export const CreateClassForm = ({ onCreated }) => {
       setSubject("");
       onCreated(); // tell Dashboard to refetch
     } catch (err) {
-      if (err.request) {
+      if (err.response) {
+        setError({ message: err.response?.data, id: Date.now() });
+      } else if (err.request) {
         setError("Network error — please check your connection.");
-      } else if (err.response) {
-        setError(err.response.data);
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -31,7 +31,7 @@ export const CreateClassForm = ({ onCreated }) => {
 
   return (
     <div className="card bg-base-200 p-4 mb-6 w-3/4 mx-auto">
-      <ErrorToast error={error} />
+      <ErrorToast key={error.id} error={error.message} />
       <div className="card bg-base-200 p-4 mb-6 flex flex-col gap-3 items-center">
         <input
           type="text"
@@ -41,7 +41,7 @@ export const CreateClassForm = ({ onCreated }) => {
           value={className}
           onChange={(e) => {
             setClassName(e.target.value);
-            setError("");
+            setError({ message: "", id: Date.now() });
           }}
         />
         <datalist id="classes">
@@ -58,7 +58,7 @@ export const CreateClassForm = ({ onCreated }) => {
           value={subject}
           onChange={(e) => {
             setSubject(e.target.value);
-            setError("");
+            setError({ message: "", id: Date.now() });
           }}
         />
         <datalist id="subjects">
@@ -79,7 +79,7 @@ export const CreateClassForm = ({ onCreated }) => {
 
 export const JoinClassForm = ({ onJoined }) => {
   const [joinCode, setJoinCode] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState({ message: "", id: 0 });
 
   const handleJoin = async () => {
     try {
@@ -91,10 +91,10 @@ export const JoinClassForm = ({ onJoined }) => {
       setJoinCode("");
       onJoined();
     } catch (err) {
-      if (err.request) {
+      if (err.response) {
+        setError({ message: err.response.data, id: Date.now() });
+      } else if (err.request) {
         setError("Network error — please check your connection.");
-      } else if (err.response) {
-        setError(err.response.data);
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -103,7 +103,7 @@ export const JoinClassForm = ({ onJoined }) => {
 
   return (
     <div className="card bg-base-200 p-4 mb-6 w-full max-w-xl mx-auto">
-      <ErrorToast error={error} />
+      <ErrorToast key={error.id} error={error.message} />
       <div className="card bg-base-200 p-4 mb-6 flex flex-col gap-3 items-center">
         <input
           type="text"
@@ -112,7 +112,7 @@ export const JoinClassForm = ({ onJoined }) => {
           value={joinCode}
           onChange={(e) => {
             setJoinCode(e.target.value);
-            setError("");
+            setError({ message: "", id: Date.now() });
           }}
         />
         <button className="btn btn-primary w-fit" onClick={handleJoin}>

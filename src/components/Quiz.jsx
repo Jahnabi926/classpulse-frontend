@@ -21,7 +21,7 @@ const Quiz = () => {
   const [answer, setAnswer] = useState("");
   const [tally, setTally] = useState(0);
   const [results, setResults] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState({ message: "", id: 0 });
 
   // Teacher-only form state
   const [question, setQuestion] = useState("");
@@ -52,7 +52,7 @@ const Quiz = () => {
     });
 
     socket.on("error", (err) => {
-      setError(err.message);
+      setError({ message: err.response?.data, id: Date.now() });
     });
 
     // Cleanup — runs when this component unmounts (e.g. navigating away).
@@ -89,7 +89,7 @@ const Quiz = () => {
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <ErrorToast key={error} error={error} />
+      <ErrorToast key={error.id} error={error.message} />
       <h1 className="text-2xl font-semibold mb-6">Live Quiz</h1>
       {role === "teacher" && (
         <div className="card bg-base-200 p-4 mb-6 flex flex-col gap-3">
@@ -107,12 +107,18 @@ const Quiz = () => {
             value={options}
             onChange={(event) => setOptions(event.target.value)}
           />
-          <button className="btn btn-primary" onClick={handleStartQuestion}>
+          <button
+            className="btn btn-primary"
+            onClick={handleStartQuestion}
+            disabled={!question.trim() || !options.trim()}
+          >
             Start question
           </button>
           {activeQuestion && (
             <>
-              <p className="text-sm opacity-70">{tally} answer(s) received</p>
+              <p className="text-sm opacity-70">
+                {tally} {tally === 1 ? "answer" : "answers"} received
+              </p>
               <button className="btn btn-error" onClick={handleEndQuestion}>
                 End question
               </button>
@@ -149,12 +155,19 @@ const Quiz = () => {
         </p>
       )}
       {/* Implemented the results count */}
-      {results && (
-        <div className="card bg-base-200 p-4">
-          <p>{Object.keys(results).length} students answered.</p>
-          {/* finalAnswers is your answers object — the exact same shape you built in submit-answer: { studentId1: "answer1", studentId2: "answer2", ... }. It's not a count, not an array — it's an object where each key is a student's ID, and the value is what they answered. */}
-        </div>
-      )}
+      {results &&
+        (() => {
+          const count = Object.keys(results).length;
+          return (
+            <div className="card bg-base-200 p-4">
+              <p>
+                {count} {count === 1 ? "student" : "students"} answered.
+              </p>
+              {/* finalAnswers is your answers object — the exact same shape you built in submit-answer: { studentId1: "answer1", studentId2: "answer2", ... }. It's not a count, not an array — it's an object where each key is a student's ID, and the value is what they answered. */}
+            </div>
+          );
+        })()}
+      {/* (() => { ... })() is  IIFE — Immediately Invoked Function Expression. this defines an anonymous arrow function. The trailing () — this is the actual call — it immediately invokes the function you just defined, right there, in the same line */}
     </div>
   );
 };
