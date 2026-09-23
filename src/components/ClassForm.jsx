@@ -82,10 +82,14 @@ export const JoinClassForm = ({ onJoined }) => {
   const [error, setError] = useState({ message: "", id: 0 });
 
   const handleJoin = async () => {
+    if (!joinCode.trim()) {
+      setError({ message: "Please enter a code", id: Date.now() });
+      return;
+    }
     try {
       await axios.post(
         BASE_URL + "/class/join",
-        { joinCode },
+        { joinCode: joinCode.trim().toUpperCase() },
         { withCredentials: true },
       );
       setJoinCode("");
