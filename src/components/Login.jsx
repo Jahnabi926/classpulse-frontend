@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import ErrorToast from "./ErrorToast";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 const Login = () => {
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -28,15 +29,7 @@ const Login = () => {
       dispatch(addUser(res.data?.data));
       navigate("/");
     } catch (err) {
-      if (err.response) {
-        // server responded with an error (e.g. wrong credentials)
-        setError({ message: err.response?.data, id: Date.now() });
-      } else if (err.request) {
-        // request sent, no response came back
-        setError("Network error — please check your connection.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError({ message: getErrorMessage(err), id: Date.now() });
     }
   };
   const handleSignUp = async () => {
@@ -49,15 +42,7 @@ const Login = () => {
       dispatch(addUser(res.data?.data));
       navigate("/profile");
     } catch (err) {
-      if (err.response) {
-        // server responded with an error (e.g. wrong credentials)
-        setError({ message: err.response?.data, id: Date.now() });
-      } else if (err.request) {
-        // request sent, no response came back
-        setError("Network error — please check your connection.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError({ message: getErrorMessage(err), id: Date.now() });
     }
   };
   return (

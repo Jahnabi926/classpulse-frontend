@@ -2,6 +2,7 @@ import { useState } from "react";
 import ErrorToast from "./ErrorToast";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 export const CreateClassForm = ({ onCreated }) => {
   const [className, setClassName] = useState("");
@@ -19,13 +20,7 @@ export const CreateClassForm = ({ onCreated }) => {
       setSubject("");
       onCreated(); // tell Dashboard to refetch
     } catch (err) {
-      if (err.response) {
-        setError({ message: err.response?.data, id: Date.now() });
-      } else if (err.request) {
-        setError("Network error — please check your connection.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError({ message: getErrorMessage(err), id: Date.now() });
     }
   };
 
@@ -95,13 +90,7 @@ export const JoinClassForm = ({ onJoined }) => {
       setJoinCode("");
       onJoined();
     } catch (err) {
-      if (err.response) {
-        setError({ message: err.response.data, id: Date.now() });
-      } else if (err.request) {
-        setError("Network error — please check your connection.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError({ message: getErrorMessage(err), id: Date.now() });
     }
   };
 

@@ -4,11 +4,13 @@ import { useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { CreateClassForm, JoinClassForm } from "./ClassForm";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.user);
   const [myClasses, setMyClasses] = useState(null);
   const navigate = useNavigate();
+  const [loadError, setLoadError] = useState("");
 
   const fetchClasses = async () => {
     try {
@@ -19,6 +21,8 @@ const Dashboard = () => {
     } catch (error) {
       if (error.response?.status === 401) {
         navigate("/login");
+      } else {
+        setLoadError(getErrorMessage(error));
       }
     }
   };
@@ -39,11 +43,13 @@ const Dashboard = () => {
         <JoinClassForm onJoined={fetchClasses} />
       )}
       <div className="grid gap-3">
+        <h1 className="text-2xl font-semibold mb-6 mx-auto">Your Classes</h1>
         {myClasses === null && <p className="opacity-60">Loading classes...</p>}
+        {loadError && <p className="text-error">{loadError}</p>}
         {myClasses?.length === 0 && (
           <p className="opacity-60">No classes yet.</p>
         )}
-        <h1 className="text-2xl font-semibold mb-6 mx-auto">Your Classes</h1>
+
         {myClasses?.map((c) => (
           <div
             key={c._id}

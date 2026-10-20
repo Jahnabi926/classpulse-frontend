@@ -5,12 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
 import ErrorToast from "./ErrorToast";
 import { useState } from "react";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 const Navbar = () => {
-  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const [error, setError] = useState({ message: "", id: 0 });
 
   const handleLogout = async () => {
     try {
@@ -18,16 +19,12 @@ const Navbar = () => {
       dispatch(removeUser());
       navigate("/login");
     } catch (err) {
-      if (err.request) {
-        setError("Network error — please check your connection.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      setError({ message: getErrorMessage(err), id: Date.now() });
     }
   };
   return (
     <div className="navbar bg-base-100 shadow-sm">
-      <ErrorToast error={error} />
+      <ErrorToast key={error.id} error={error.message} />
       <div className="flex-1">
         <Link to={user ? "/" : "/login"} className="btn btn-ghost text-xl">
           ClassPulse
@@ -59,7 +56,7 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link onClick={handleLogout}>Logout</Link>
+                <button onClick={handleLogout}>Logout</button>
               </li>
             </ul>
           </div>

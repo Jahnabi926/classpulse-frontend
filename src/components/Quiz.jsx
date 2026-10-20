@@ -6,7 +6,8 @@ import ErrorToast from "./ErrorToast";
 
 const Quiz = () => {
   const { classId } = useParams();
-  const { role } = useSelector((store) => store.user);
+  const user = useSelector((store) => store.user);
+  const role = user?.role;
 
   // useRef, not useState — the socket connection has no bearing on what's
   // rendered, so there's no reason to trigger a re-render when it's set.
@@ -26,6 +27,7 @@ const Quiz = () => {
   // Teacher-only form state
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const socket = createSocketConnection();
@@ -40,6 +42,7 @@ const Quiz = () => {
       setAnswer("");
       setResults(null);
       setTally(0);
+      setSubmitted(false);
     });
 
     socket.on("answers-received", (data) => {
@@ -52,7 +55,7 @@ const Quiz = () => {
     });
 
     socket.on("error", (err) => {
-      setError({ message: err.response?.data, id: Date.now() });
+      setError({ message: err.message, id: Date.now() });
     });
 
     // Cleanup — runs when this component unmounts (e.g. navigating away).
@@ -77,9 +80,9 @@ const Quiz = () => {
   };
 
   const handleSubmitAnswer = () => {
-    // Implemented submit-answer emission with { classId, answer } and cleared the answer afterward
+    // Implemented submit-answer emission with { classId, answer } and locked the answer with submitted.
     socketRef.current?.emit("submit-answer", { classId, answer });
-    setAnswer("");
+    setSubmitted(true);
   };
 
   const handleEndQuestion = () => {
@@ -136,6 +139,7 @@ const Quiz = () => {
               key={option}
               className={`btn ${answer === option ? "btn-primary" : "btn-outline"}`}
               onClick={() => setAnswer(option)}
+              disabled={submitted}
             >
               {option}
             </button>
@@ -143,10 +147,15 @@ const Quiz = () => {
           <button
             className="btn btn-primary"
             onClick={handleSubmitAnswer}
-            disabled={!answer}
+            disabled={!answer || submitted}
           >
             Submit answer
           </button>
+          {submitted && (
+            <p className="opacity-70">
+              Answer submitted. Waiting for results...
+            </p>
+          )}
         </div>
       )}
       {role === "student" && !activeQuestion && !results && (
