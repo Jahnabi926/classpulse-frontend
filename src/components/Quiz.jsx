@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { createSocketConnection } from "../utils/socket";
 import ErrorToast from "./ErrorToast";
+import QuizGenerator from "./QuizGenerator";
 
 const Quiz = () => {
   const { classId } = useParams();
@@ -24,9 +25,6 @@ const Quiz = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState({ message: "", id: 0 });
 
-  // Teacher-only form state
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -65,26 +63,15 @@ const Quiz = () => {
     };
   }, [classId]);
 
-  const handleStartQuestion = () => {
-    //  Implemented start-question emission with parsed options and cleared both form fields.
-    socketRef.current?.emit("start-question", {
-      classId,
-      question,
-      options: options
-        .split(",")
-        .map((option) => option.trim())
-        .filter(Boolean),
-    });
-    setQuestion("");
-    setOptions("");
-  };
-
   const handleSubmitAnswer = () => {
     // Implemented submit-answer emission with { classId, answer } and locked the answer with submitted.
     socketRef.current?.emit("submit-answer", { classId, answer });
     setSubmitted(true);
   };
 
+  const launchQuestion = ({ question, options }) => {
+    socketRef.current?.emit("start-question", { classId, question, options });
+  };
   const handleEndQuestion = () => {
     // Implemented the end-question socket emission with { classId }
     socketRef.current?.emit("end-question", { classId });
@@ -95,38 +82,20 @@ const Quiz = () => {
       <ErrorToast key={error.id} error={error.message} />
       <h1 className="text-2xl font-semibold mb-6">Live Quiz</h1>
       {role === "teacher" && (
+        <QuizGenerator
+          onLaunch={launchQuestion}
+          questionActive={!!activeQuestion}
+        />
+      )}
+      {role === "teacher" && activeQuestion && (
         <div className="card bg-base-200 p-4 mb-6 flex flex-col gap-3">
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            placeholder="Question"
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-          />
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            placeholder="Options (comma-separated)"
-            value={options}
-            onChange={(event) => setOptions(event.target.value)}
-          />
-          <button
-            className="btn btn-primary"
-            onClick={handleStartQuestion}
-            disabled={!question.trim() || !options.trim()}
-          >
-            Start question
+          <p className="font-medium">{activeQuestion.question}</p>
+          <p className="text-sm opacity-70">
+            {tally} {tally === 1 ? "answer" : "answers"} received
+          </p>
+          <button className="btn btn-error" onClick={handleEndQuestion}>
+            End question
           </button>
-          {activeQuestion && (
-            <>
-              <p className="text-sm opacity-70">
-                {tally} {tally === 1 ? "answer" : "answers"} received
-              </p>
-              <button className="btn btn-error" onClick={handleEndQuestion}>
-                End question
-              </button>
-            </>
-          )}
         </div>
       )}
       {/* question display, selectable option buttons, and a
